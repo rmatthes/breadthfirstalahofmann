@@ -717,6 +717,66 @@ Proof.
   reflexivity.
 Qed.
 
+(** standalone verification *)
+Function traverse (ts: forest) {measure depthf ts}: Rou' :=
+  match ts with
+  | [] => []
+  | t::ts' => addroots (t::ts') :: (traverse (sub (t::ts')))
+  end.
+Proof.
+  intros ts t ts' _.
+  rewrite (depthsub (t::ts')).
+  2: { intro Hyp. discriminate. }
+  lia.
+Defined.
+
+Check traverse_ind.
+Check traverse_equation.
+
+Lemma traverse_cons (t: tree)(ts: forest): traverse (t::ts) = addroots (t::ts) :: traverse (sub (t::ts)).
+Proof.
+  apply traverse_equation.
+Qed.
+
+Lemma extract'_traverse_Lemma (ts: forest): extract' (traverse ts) = breadthfirstf_spec ts.
+Proof.
+  functional induction (traverse ts) using traverse_ind.
+  - reflexivity.
+  - unfold extract'.
+    transitivity (addroots ( t:: ts') (breadthfirstf_spec (sub (t :: ts')))).
+    { f_equal. assumption. }
+    clear IHr.
+    do 2 rewrite <- cforest_extract_Lemma.
+    rewrite cforest_cons.
+    reflexivity.
+Qed.
+
+Lemma br'_traverse_Lemma (t: tree)(ts: forest): br' t (traverse ts) = traverse (t::ts).
+Proof.
+  revert ts.
+  induction t; intro ts.
+  - rewrite traverse_cons.
+    functional induction (traverse ts) using traverse_ind; reflexivity.
+  - rewrite traverse_cons.
+    simpl sub.
+    rewrite <- IHt1.
+    rewrite <- IHt2.
+    clear IHt1 IHt2.
+    functional induction (traverse ts) using traverse_ind; reflexivity.
+Qed.
+
+Lemma breadthfirst'_verif (t: tree): breadthfirst' t = breadthfirst_spec t.
+Proof.
+  unfold breadthfirst', breadthfirst_spec.
+  change ([]) with (traverse []).
+  rewrite br'_traverse_Lemma.
+  rewrite extract'_traverse_Lemma.
+  unfold breadthfirstf_spec.
+  simpl. rewrite zip_with_nil.
+  reflexivity.
+Qed.
+
+
 (** *** Section in paper entitled "A simplified predicative version of [breadthfirst]" *)
 
 Definition ψ (l: list nat): (list nat -> list nat) := fun l' => l ++ l'.
@@ -1040,6 +1100,43 @@ Proof.
       symmetry.
       apply extract'_Lemma.
 Qed.
+
+(** the extra simulation *)
+Lemma S_pred1_simulates_S_forest: functionalsimulation S_pred1 S_forest traverse.
+Proof.
+  red.
+  split.
+  - unfold Nil; simpl. reflexivity.
+  - intro ts.
+    split.
+    + intro t.
+      unfold g; simpl.
+      apply br'_traverse_Lemma.
+    + unfold e; simpl.
+      apply extract'_traverse_Lemma.
+Qed.
+
+(** the extra decompositions *)
+Lemma traverse_decomposes (ts: forest): traverse ts = Ψ (nivf ts).
+Proof.
+  functional induction (traverse ts) using traverse_ind.
+  - reflexivity.
+  - rewrite IHr.
+    rewrite (nivfrootssub (t::ts')).
+    2: { intro Hyp. discriminate. }
+    reflexivity.
+Qed.
+
+Lemma cforest_decomposes (ts: forest): cforest ts = Φ (traverse ts).
+Proof.
+  functional induction (cforest ts) using cforest_ind.
+  - reflexivity.
+  - rewrite IHr.
+    rewrite traverse_cons.
+    reflexivity.
+Qed.
+
+(** end of extra simulation / decompositions *)
 
 Definition S_pred2: Sys := mkSys Rou'' [] br'' flatten.
 
