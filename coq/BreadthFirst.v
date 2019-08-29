@@ -1,6 +1,10 @@
 (** Authors:
 Simon Boulier (INRIA) for the part before the def. of γ (without the simple lemmas)
 Ralph Matthes (IRIT - CNRS and Univ. of Toulouse) for the three different methods of verification, all suggested in 1995 and for the forest-based verification and new system view found in 2018
+
+occasional references are made to the paper "Martin Hofmann’s case for non-strictly positive
+data types" by U. Berger, R. Matthes and A. Setzer, to appear in LIPIcs vol. 130 (TYPES 2018 post-proceedings)
+
 *)
 
 From TypingFlags Require Import Loader.
@@ -355,7 +359,7 @@ Qed.
 Print Assumptions rep_Verif.
 
 (** ** Verification through the extension to forests *)
-(** Section in paper entitled "An alternative proof of the correctness of [breadthfirst]" *)
+(** Section in paper entitled "A proof of the correctness of [breadthfirst] using forests" *)
 
 Fixpoint depth (t: tree): nat :=
   match t with
