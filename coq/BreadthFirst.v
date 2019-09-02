@@ -359,7 +359,7 @@ Qed.
 Print Assumptions rep_Verif.
 
 (** ** Verification through the extension to forests *)
-(** Section in paper entitled "A proof of the correctness of [breadthfirst] using forests" *)
+(** Section in paper entitled "Verification by interpreting routines as recursive programs" *)
 
 Fixpoint depth (t: tree): nat :=
   match t with
