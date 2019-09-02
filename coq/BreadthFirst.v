@@ -33,6 +33,41 @@ Fixpoint zip (l1 l2 : list (list nat)) : list (list nat) :=
   | x :: l, x' :: l' => (x ++ x') :: (zip l l')
   end.
 
+(** diversion: a remark by Ulrich Berger translated into Coq *)
+Fixpoint zipWithDefaults {A B C: Type} (f: A -> B -> C) (a0: A) (b0: B)
+  (l1: list A) (l2: list B) : list C :=
+  match l1, l2 with
+  | [], _  => map (f a0) l2
+  | x :: l, [] => map (fun a => f a b0) l1
+  | x :: l, x' :: l' => f x x' :: (zipWithDefaults f a0 b0 l l')
+  end.
+
+Lemma zipIsZipWithDefaults (l1 l2 : list (list nat)):
+  zip l1 l2 = zipWithDefaults (@app _) [] [] l1 l2.
+Proof.
+  revert l2.
+  induction l1 as [| a l1 IHl1].
+  - intros ?.
+    simpl.
+    rewrite map_id.
+    reflexivity.
+  - induction l2.
+    + simpl.
+      rewrite app_nil_r.
+      f_equal.
+      clear IHl1.
+      induction l1.
+      * reflexivity.
+      * simpl.
+        rewrite app_nil_r.
+        f_equal.
+        assumption.
+    + simpl.
+      f_equal.
+      apply IHl1.
+Qed.
+(** end of diversion *)
+
 Lemma zip_with_nil (l: list (list nat)): zip l [] = l.
 Proof.
   destruct l; reflexivity.
