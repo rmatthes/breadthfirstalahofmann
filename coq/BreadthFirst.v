@@ -3,7 +3,8 @@ Simon Boulier (INRIA) for the part before the def. of γ (without the simple lem
 Ralph Matthes (IRIT - CNRS and Univ. of Toulouse) for the three different methods of verification, all suggested in 1995 and for the forest-based verification and new system view found in 2018
 
 occasional references are made to the paper "Martin Hofmann’s case for non-strictly positive
-data types" by U. Berger, R. Matthes and A. Setzer, in LIPIcs vol. 130 (TYPES 2018 post-proceedings), https://doi.org/10.4230/LIPIcs.TYPES.2018.1
+data types" by U. Berger, R. Matthes and A. Setzer, in LIPIcs vol. 130 (TYPES 2018 post-proceedings),
+https://doi.org/10.4230/LIPIcs.TYPES.2018.1
 
 *)
 
