@@ -3,12 +3,9 @@ Simon Boulier (INRIA) for the part before the def. of γ (without the simple lem
 Ralph Matthes (IRIT - CNRS and Univ. of Toulouse) for the three different methods of verification, all suggested in 1995 and for the forest-based verification and new system view found in 2018
 
 occasional references are made to the paper "Martin Hofmann’s case for non-strictly positive
-data types" by U. Berger, R. Matthes and A. Setzer, to appear in LIPIcs vol. 130 (TYPES 2018 post-proceedings)
+data types" by U. Berger, R. Matthes and A. Setzer, in LIPIcs vol. 130 (TYPES 2018 post-proceedings), https://doi.org/10.4230/LIPIcs.TYPES.2018.1
 
 *)
-
-From TypingFlags Require Import Loader.
-
 
 Inductive tree :=
 | leaf : nat -> tree
@@ -102,11 +99,11 @@ Definition breadthfirst_spec t := flatten (niv t).
 Compute (niv ex1).
 Compute (breadthfirst_spec ex1).
 
-Unset Guard Checking.
+Unset Positivity Checking.
 Inductive Rou :=
 | Over : Rou
 | Next : ((Rou -> list nat) -> list nat) -> Rou.
-Set Guard Checking.
+Set Positivity Checking.
 
 Definition unfoldRou (c : Rou) (k : Rou -> list nat) : list nat :=
   match c with
@@ -218,12 +215,14 @@ Print Assumptions MH_Verif.
 Definition isextractor (R: Rou -> list(list nat) -> Prop)(ll: list(list nat))(k:Rou -> list nat): Prop :=
     forall (c: Rou)(ll1: list(list nat)), R c ll1 -> k c = flatten(zip ll ll1).
 
-Unset Guard Checking.
+Unset Positivity Checking.
 Inductive rep: Rou -> list (list nat) -> Prop :=
 | overrep: rep Over []
 | nextrep: forall (f: (Rou -> list nat) -> list nat)(l: list nat)(ll: list(list nat)), (forall (k: Rou -> list nat)(ll': list(list nat)), isextractor rep ll' k -> f k = l ++ flatten(zip ll' ll)) -> rep (Next f) (l::ll).
 (** is a non-strictly positive inductive proposition - could equivalently be defined impredicatively thanks to impredicativity of Prop *)
+Set Positivity Checking.
 
+Unset Guard Checking.
 Fixpoint rep_ind (R : Rou -> list (list nat) -> Prop)(HypO: R Over [])
          (HypN: forall (f: (Rou -> list nat) -> list nat)(l: list nat)(ll: list(list nat)), (forall (k: Rou -> list nat)(ll': list(list nat)), isextractor R ll' k -> f k = l ++ flatten(zip ll' ll)) -> R (Next f) (l::ll)) (c : Rou) (l : list (list nat))(Hyp: rep c l) {struct Hyp}: R c l :=
   match Hyp in (rep c0 l0) return (R c0 l0) with
