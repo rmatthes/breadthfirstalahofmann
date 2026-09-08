@@ -541,7 +541,7 @@ Proof.
       rewrite depthnode.
       rewrite IHf.
       2: { intro Hyp. discriminate. }
-      change (depthf (tl :: tr :: sub (t :: ts'))) with (max (depth tl) (max (depth tr) (depthf (sub (t::ts'))))). Search(forall n m p : nat, Nat.max (n + p) (m + p) = Nat.max n m + p).
+      change (depthf (tl :: tr :: sub (t :: ts'))) with (max (depth tl) (max (depth tr) (depthf (sub (t::ts'))))).
       rewrite Nat.add_max_distr_r.
       f_equal.
       symmetry.
