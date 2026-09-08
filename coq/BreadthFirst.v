@@ -23,7 +23,7 @@ Proof.
     exact (node (leaf 10) 8 (leaf 11)).
 Defined.
 
-Require Import List.
+From Stdlib Require Import List.
 Import ListNotations.
 
 Fixpoint zip (l1 l2 : list (list nat)) : list (list nat) :=
@@ -156,7 +156,7 @@ Qed.
 (** the following is required to get the proofs with Coq through although
     a pencil-and-paper proof is possible that all these equations hold
     w.r.t. convertibility for all input lists *)
-Require Import Logic.FunctionalExtensionality.
+From Stdlib Require Import Logic.FunctionalExtensionality.
 
 Lemma MH_LemmaB (ll ll':list (list nat))(c: Rou): γ ll (γ ll' c) = γ (zip ll ll') c.
 Proof.
@@ -434,7 +434,7 @@ Fixpoint sub (ts: forest): forest :=
 
 Definition breadthfirstf_spec (ts: forest) : list nat := flatten (nivf ts).
 
-Require Import FunInd.
+From Stdlib Require Import FunInd.
 Functional Scheme zip_ind := Induction for zip Sort Prop.
 Functional Scheme sub_ind := Induction for sub Sort Prop.
 
@@ -469,17 +469,16 @@ Proof.
     apply lengthzip.
 Qed.
 
-Require Import Arith.Le.
-Require Import Arith.PeanoNat.
-Require Import Arith.Compare_dec.
-Require Import Arith.Max. (* a deprecated file *)
+
+From Stdlib Require Import Arith.PeanoNat.
+From Stdlib Require Import Arith.Compare_dec.
 
 (** five preparatory lemmas *)
 
 Lemma depthgeone (t: tree): 1 <= depth t.
 Proof.
   destruct t as [n | tl n tr].
-  - simpl. apply le_refl.
+  - simpl. apply Nat.le_refl.
   - simpl. apply le_n_S. apply le_0_n.
 Qed.
 
@@ -489,7 +488,7 @@ Proof.
   generalize (le_ge_dec n1 n2).
   intros [Hyp | Hyp] H.
   - rewrite max_r.
-    + apply le_trans with n1; assumption.
+    + apply Nat.le_trans with n1; assumption.
     + assumption.
   - rewrite max_l; assumption.
 Qed.
@@ -514,7 +513,7 @@ Proof.
     + apply depthfgeone. intro Hyp. discriminate.
 Qed.
 
-Require Import Lia.  (** instead of Omega *)
+From Stdlib Require Import Lia.  (** instead of Omega *)
 
 Lemma depthnode (n: nat)(tl tr: tree): depth(node tl n tr) = max (depth tl) (depth tr) + 1.
 Proof.
@@ -542,12 +541,12 @@ Proof.
       rewrite depthnode.
       rewrite IHf.
       2: { intro Hyp. discriminate. }
-      change (depthf (tl :: tr :: sub (t :: ts'))) with (max (depth tl) (max (depth tr) (depthf (sub (t::ts'))))).
-      rewrite plus_max_distr_r.
+      change (depthf (tl :: tr :: sub (t :: ts'))) with (max (depth tl) (max (depth tr) (depthf (sub (t::ts'))))). Search(forall n m p : nat, Nat.max (n + p) (m + p) = Nat.max n m + p).
+      rewrite Nat.add_max_distr_r.
       f_equal.
       symmetry.
-      apply max_assoc.
-Qed.     
+      apply Nat.max_assoc.
+Qed.
 
 (** two auxiliary lemmas: *)
 Lemma nivrootssuboneelement (t: tree): nivf [t] = roots [t] :: nivf (sub [t]).
@@ -585,10 +584,10 @@ Qed.
 Definition next (g: list nat -> list nat) (c: Rou): Rou :=  Next(fun k: Rou -> list nat => g(k c)).
 Definition addroots (ts: forest): list nat -> list nat := app (roots ts).
 
-Require Import Lia.
+From Stdlib Require Import Lia.
 
 (*
-Require Import Program.
+From Stdlib Require Import Program.
 Program Fixpoint cforest' (ts: forest) {measure (depthf ts)}: Rou :=
   match ts with
   | [] => Over
@@ -619,7 +618,7 @@ Next Obligation.
 Qed.
 *)
 
-Require Import Recdef.
+From Stdlib Require Import Recdef.
 Function cforest (ts: forest) {measure depthf ts}: Rou :=
   match ts with
   | [] => Over
